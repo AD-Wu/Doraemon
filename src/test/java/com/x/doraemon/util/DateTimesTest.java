@@ -29,8 +29,8 @@ class DateTimesTest {
         Field[] fields = clazz.getFields();
         for (Field field : fields) {
             BaseFormat o = (BaseFormat) field.get(null);
-            String format = DateTimes.format(LocalDateTime.now(), o);
-            System.out.println(format + "   " + DateTimes.toLocalDateTime(format));
+            String format = Dates.format(LocalDateTime.now(), o);
+            System.out.println(format + "   " + Dates.toLocalDateTime(format));
         }
     }
     

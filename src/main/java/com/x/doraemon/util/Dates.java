@@ -20,7 +20,7 @@ import java.util.*;
  * @Date 2020/9/17 21:08
  * @Author AD
  */
-public final class DateTimes {
+public final class Dates {
     
     // ------------------------ 变量定义 ------------------------
     
@@ -35,7 +35,7 @@ public final class DateTimes {
     private static final DateTimeFormatter[] DATE_TIME_FORMATTERS;
     
     // ------------------------ 构造方法 ------------------------
-    private DateTimes() {}
+    private Dates() {}
     // ------------------------ 方法定义 ------------------------
     
     /**
