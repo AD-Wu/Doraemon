@@ -1,18 +1,18 @@
 package com.x.doraemon.util;
 
 import com.x.doraemon.bean.New;
-import com.x.doraemon.enums.DateTimePattern;
+import com.x.doraemon.enums.date.BaseFormat;
+import com.x.doraemon.enums.date.DateFormat;
+import com.x.doraemon.enums.date.DateTimeFormat;
+import com.x.doraemon.enums.date.TimeFormat;
 import com.x.doraemon.interfaces.IDateTimePattern;
 
 import java.lang.reflect.Field;
-import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
 import java.util.*;
 
 /**
@@ -24,73 +24,163 @@ public final class DateTimes {
     
     // ------------------------ 变量定义 ------------------------
     
-    private static final List<DateTimePattern> patterns = New.list();
+    private static final BaseFormat[] FORMATS;
     
-    private static final List<DateTimeFormatter> formatters = New.list();
+    private static final DateTimeFormat[] DATE_TIME_FORMATS;
     
-    private static final int pattersCount;
+    private static final DateFormat[] DATE_FORMATS;
     
-    private static final int formatterCount;
+    private static final TimeFormat[] TIME_FORMATS;
+    
+    private static final DateTimeFormatter[] DATE_TIME_FORMATTERS;
     
     // ------------------------ 构造方法 ------------------------
     private DateTimes() {}
     // ------------------------ 方法定义 ------------------------
     
+    /**
+     * 自动将对象转为日期时间类（包括日期和时间，在DateTimeFormat里找对应的样式）
+     *
+     * @param dateTime 字符串、Date、LocalDateTime、int、long对象
+     *
+     * @return LocalDateTime对象
+     *
+     * @throws Exception 没有样式异常
+     */
     public static LocalDateTime toLocalDateTime(Object dateTime) throws Exception {
+        // 将对象转换为LocalDateTime对象
         LocalDateTime local = toLocalDateTime(dateTime, null);
+        // 判断有效性
         if (local == null) {
             String patter = "Can not parse the dateTime={0},implements {1} and add the annotation:@AutoService({2})";
             String name = IDateTimePattern.class.getName();
             String msg = Strings.replace(patter, dateTime, name, name);
             throw new RuntimeException(msg);
         }
+        // 返回结果
         return local;
     }
     
+    /**
+     * 自动将对象转为日期时间类（包括日期和时间，在DateTimePattern里找对应的样式），转换异常时返回默认值
+     *
+     * @param dateTime     字符串、Date、LocalDateTime、int、long对象
+     * @param defaultValue 默认值
+     *
+     * @return LocalDateTime对象
+     *
+     * @throws Exception
+     */
     public static LocalDateTime toLocalDateTime(Object dateTime, LocalDateTime defaultValue) throws Exception {
+        // 判断有效性
         if (dateTime == null) {
             return defaultValue;
-        } else if (dateTime instanceof LocalDateTime) {
+        }
+        // 如果是LocalDateTime对象，直接返回
+        else if (dateTime instanceof LocalDateTime) {
             return (LocalDateTime) dateTime;
-        } else if (dateTime instanceof Date) {
+        }
+        // 如果是Date对象，进行转换
+        else if (dateTime instanceof Date) {
             return dateToLocalDateTime((Date) dateTime);
-        } else if (!(dateTime instanceof Long) && !(dateTime instanceof Integer)) {
+        }
+        // 不是数int或long，则转成String对象
+        else if (!(dateTime instanceof Long) && !(dateTime instanceof Integer)) {
+            // 将字符串解析为LocalDateTime对象
             LocalDateTime localDateTime = parseStringToLocalDateTime(dateTime.toString(), 0);
+            // 判断解析结果是否有效
             if (localDateTime == null) {
+                // 将字符串解析为Date对象
                 Date date = parseStringToDate(dateTime.toString(), 0);
+                // 无效返回默认值
                 if (date == null) {
                     return defaultValue;
                 }
+                // 有效则将Date转为LocalDateTime对象
                 return dateToLocalDateTime(date);
             }
             return localDateTime;
         }
+        // 是int或long类型，则先转为Date，再转为LocalDateTime对象
         return dateToLocalDateTime(new Date((Long) dateTime));
     }
     
+    /**
+     * 自动将对象转为Date，不推荐使用Date，推荐使用LocalDateTime
+     *
+     * @param date 对象，如：String、int、long、Date、LocalDateTime
+     *
+     * @return Date 日期对象
+     *
+     * @throws Exception
+     */
     public static Date toDate(Object date) throws Exception {
         return toDate(date, null);
     }
     
+    /**
+     * 自动将对象转为Date，不推荐使用Date，推荐使用LocalDateTime
+     *
+     * @param date        对象，如：String、int、long、Date、LocalDateTime
+     * @param defaultDate 默认值
+     *
+     * @return Date 日期对象
+     *
+     * @throws Exception
+     */
     public static Date toDate(Object date, Date defaultDate) throws Exception {
-        if (defaultDate == null) {
-            return localDateTimeToDate(toLocalDateTime(date));
+        LocalDateTime defaultValue = null;
+        // 判断默认值是否有效
+        if (defaultDate != null) {
+            // 将默认值Date转为LocalDateTime对象（同时进行修正）
+            defaultValue = dateToLocalDateTime(defaultDate);
         }
-        LocalDateTime defaultValue = fixLocalDateTime(defaultDate, LocalDateTime.now());
+        // 转换：Object->LocalDateTime->Date
         return localDateTimeToDate(toLocalDateTime(date, defaultValue));
     }
     
+    /**
+     * 日期格式化，结果样式：yyyy-MM-dd HH:mm:ss.SSS
+     *
+     * @param dateTime 格式化对象
+     *
+     * @return
+     *
+     * @throws Exception
+     */
     public static String format(Object dateTime) throws Exception {
-        return format(dateTime, DateTimePattern.DATE_TIME.getPattern());
+        return format(dateTime, DateTimeFormat.DEFAULT.getFormat());
     }
     
-    public static String format(Object dateTime, DateTimePattern pattern) throws Exception {
-        return format(dateTime, pattern.getPattern());
+    /**
+     * 日期格式化
+     *
+     * @param dateTime 格式化对象
+     * @param format   格式化样式对象
+     *
+     * @return
+     *
+     * @throws Exception
+     */
+    public static String format(Object dateTime, BaseFormat format) throws Exception {
+        return format(dateTime, format.getFormat());
     }
     
+    /**
+     * 日期格式化
+     *
+     * @param dateTime 格式化对象
+     * @param pattern  格式化样式
+     *
+     * @return
+     *
+     * @throws Exception
+     */
     public static String format(Object dateTime, String pattern) throws Exception {
+        // 将对象转为Date对象
         Date date = toDate(dateTime);
         try {
+            // 进行格式化（自定义样式的建议使用SimpleDateFormat）
             return new SimpleDateFormat(pattern).format(date);
         } catch (Exception e) {
             e.printStackTrace();
@@ -102,7 +192,7 @@ public final class DateTimes {
     /**
      * 是否闰年
      *
-     * @param year
+     * @param year 年份
      */
     public static boolean isLeapYear(int year) {
         if (year % 100 != 0) {
@@ -116,15 +206,29 @@ public final class DateTimes {
     }
     
     // ------------------------ 私有方法 ------------------------
+    
+    /**
+     * 将字符串解析城Date对象
+     *
+     * @param dateTime
+     * @param index
+     *
+     * @return
+     */
     private static Date parseStringToDate(String dateTime, int index) {
-        if (index < pattersCount) {
-            DateTimePattern pattern = patterns.get(index);
-            Locale[] locales = pattern.getLocales();
+        // 判断是否还存在DateTime的样式
+        if (index < FORMATS.length) {
+            // 获取当前样式
+            BaseFormat format = FORMATS[index];
+            // 获取所有的语言
+            Locale[] locales = format.getLocales();
             Date parse = null;
             for (Locale locale : locales) {
                 try {
-                    parse = new SimpleDateFormat(pattern.getPattern(), locale).parse(dateTime,
+                    // 解析结果
+                    parse = new SimpleDateFormat(format.getFormat(), locale).parse(dateTime,
                             new ParsePosition(0));
+                    // 判断有效性
                     if (parse == null) {
                         continue;
                     }
@@ -133,6 +237,7 @@ public final class DateTimes {
                     continue;
                 }
             }
+            // 当前样式无法解析，则递归解析
             if (parse == null) {
                 return parseStringToDate(dateTime, ++index);
             }
@@ -140,15 +245,26 @@ public final class DateTimes {
         return null;
     }
     
+    /**
+     * 将字符串解析城LocalDateTime对象
+     *
+     * @param dateTime
+     * @param index
+     *
+     * @return
+     */
     private static LocalDateTime parseStringToLocalDateTime(String dateTime, int index) {
-        if (index < formatterCount) {
-            DateTimeFormatter formatter = formatters.get(index);
+        // 判断是否还有日期时间格式化对象
+        if (index < DATE_TIME_FORMATTERS.length) {
             try {
-                return LocalDateTime.from(formatter.parse(dateTime));
+                // 解析
+                return LocalDateTime.from(DATE_TIME_FORMATTERS[index].parse(dateTime));
             } catch (Exception e) {
+                // 解析异常则递归解析
                 return parseStringToLocalDateTime(dateTime, ++index);
             }
         }
+        // 无法解析返回空
         return null;
     }
     
@@ -162,10 +278,11 @@ public final class DateTimes {
     @SuppressWarnings("all")
     private static Date localDateTimeToDate(LocalDateTime localDateTime) {
         Date date = new Date();
-        // LocalDateTime使用正数，如：1100=1100;Date：1100=1100-1900
-        int localYear = localDateTime.getYear();
-        int year = localYear - 1900;
-        date.setYear(year);
+        /*
+            - LocalDateTime使用正数，如：1100=1100
+            - Date使用1900做为基准，1910:1910-1900=10，1100=1100-1900=-800
+         */
+        date.setYear(localDateTime.getYear() - 1900);
         date.setMonth(localDateTime.getMonthValue() - 1);
         date.setDate(localDateTime.getDayOfMonth());
         date.setHours(localDateTime.getHour());
@@ -188,149 +305,96 @@ public final class DateTimes {
         if (date == null) {
             return null;
         }
+        // 获取当前时区
         ZoneId zoneId = ZoneId.systemDefault();
-        LocalDateTime before = date.toInstant().atZone(zoneId).toLocalDateTime();
+        // 先转成LocalDateTime对象
+        LocalDateTime local = date.toInstant().atZone(zoneId).toLocalDateTime();
         /*
-         * 修正,如：
+         * 进行修正,不然会有时间错误。如：
          * date=1700-3-2 1:2:3.234 => localDateTime=1700-03-02T01:07:46
          * date=1100-3-2 1:2:3.234 => localDateTime=1100-03-09T01:07:46.234
          */
-        return fixLocalDateTime(date, before);
-    }
-    
-    /**
-     * 修正时间转换误差,如：
-     * date=1700-3-2 1:2:3.234 => localDateTime=1700-03-02T01:07:46
-     * date=1100-3-2 1:2:3.234 => localDateTime=1100-03-09T01:07:46.234
-     *
-     * @param date  原始值
-     * @param local 需修正的值
-     *
-     * @return
-     */
-    private static LocalDateTime fixLocalDateTime(Date date, LocalDateTime local) {
-        if (local == null) {LocalDateTime.now();}
-        // 年
-        int dateYear = date.getYear();
-        int localYear = local.getYear();
-        // 月,Date：0=一月
-        int dateMonth = date.getMonth() + 1;
-        Month localMonth = local.getMonth();
-        // 日
-        int dateDay = date.getDate();
-        int localDay = local.getDayOfMonth();
-        // 时
-        int dateHours = date.getHours();
-        int localHours = local.getHour();
-        // 分
-        int dateMinutes = date.getMinutes();
-        int localMinutes = local.getMinute();
-        // 秒
-        int dateSeconds = date.getSeconds();
-        int localSeconds = local.getSecond();
-        // 不相等才设置，否则会出现莫名其妙的错误
-        if (dateYear != localYear) {
-            if (dateMonth != localMonth.getValue()) {
-                if (dateDay != localDay) {
-                    if (dateHours != localHours) {
-                        if (dateMinutes != localMinutes) {
-                            if (dateSeconds != localSeconds) {
-                                LocalDateTime result = local
-                                        .withYear(dateYear)
-                                        .withMonth(dateMonth)
-                                        .withDayOfMonth(dateDay)
-                                        .withHour(dateHours)
-                                        .withMinute(dateMinutes)
-                                        .withSecond(dateSeconds)
-                                        .withNano(local.getNano());
-                                return result;
-                            } else {
-                                LocalDateTime result = local
-                                        .withNano(local.getNano());
-                                return result;
-                            }
-                        } else {
-                            LocalDateTime result = local
-                                    .withSecond(dateSeconds)
-                                    .withNano(local.getNano());
-                            return result;
-                        }
-                    } else {
-                        LocalDateTime result = local
-                                .withMinute(dateMinutes)
-                                .withSecond(dateSeconds)
-                                .withNano(local.getNano());
-                        return result;
-                    }
-                } else {
-                    LocalDateTime result = local
-                            .withHour(dateHours)
-                            .withMinute(dateMinutes)
-                            .withSecond(dateSeconds)
-                            .withNano(local.getNano());
-                    return result;
-                }
-            } else {
-                LocalDateTime result = local
-                        .withDayOfMonth(dateDay)
-                        .withHour(dateHours)
-                        .withMinute(dateMinutes)
-                        .withSecond(dateSeconds)
-                        .withNano(local.getNano());
-                return result;
-            }
-        } else {
-            LocalDateTime result = local
-                    .withMonth(dateMonth)
-                    .withDayOfMonth(dateDay)
-                    .withHour(dateHours)
-                    .withMinute(dateMinutes)
-                    .withSecond(dateSeconds)
-                    .withNano(local.getNano());
-            return result;
+        if (date.getYear() != local.getYear()) {
+            // Date的年是以1900为基准的，如：1910年为10，1700年为-200
+            local = local.withYear(date.getYear() + 1900);
         }
+        if (date.getMonth() + 1 != local.getMonthValue()) {
+            local = local.withMonth(date.getMonth() + 1);
+        }
+        if (date.getDate() != local.getDayOfMonth()) {
+            local = local.withDayOfMonth(date.getDate());
+        }
+        if (date.getHours() != local.getHour()) {
+            local = local.withHour(date.getHours());
+        }
+        if (date.getMinutes() != local.getMinute()) {
+            local = local.withMinute(date.getMinutes());
+        }
+        if (date.getSeconds() != local.getSecond()) {
+            local = local.withSecond(date.getSeconds());
+        }
+        return local;
     }
     
     // ------------------------ 静态内部类 ------------------------
     
     static {
-        Field[] patternFields = DateTimePattern.class.getFields();
-        for (Field field : patternFields) {
-            field.setAccessible(true);
-            if (field.getType().equals(DateTimePattern.class)) {
-                try {
-                    DateTimePattern pattern = (DateTimePattern) field.get(null);
-                    patterns.add(pattern);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
+        List<BaseFormat> formats = New.list();
+        // 初始化日期时间样式
+        List<DateTimeFormat> dateTimes = New.list();
+        for (Field field : DateTimeFormat.class.getFields()) {
+            dateTimes.add(getFieldValue(field, DateTimeFormat.class));
         }
-        ServiceLoader<IDateTimePattern> load = ServiceLoader.load(IDateTimePattern.class);
-        Iterator<IDateTimePattern> it = load.iterator();
+        
+        Iterator<IDateTimePattern> it = ServiceLoader.load(IDateTimePattern.class).iterator();
         while (it.hasNext()) {
             IDateTimePattern next = it.next();
             String pattern = next.getPattern();
             Locale locale = next.getLocale();
-            patterns.add(new DateTimePattern(pattern, locale));
+            dateTimes.add(new DateTimeFormat(pattern, locale));
         }
+        DATE_TIME_FORMATS = dateTimes.toArray(new DateTimeFormat[0]);
         
-        Field[] fields = DateTimeFormatter.class.getDeclaredFields();
-        for (Field field : fields) {
+        // 初始化日期样式
+        List<DateFormat> dates = New.list();
+        for (Field field : DateFormat.class.getFields()) {
+            dates.add(getFieldValue(field, DateFormat.class));
+        }
+        DATE_FORMATS = dates.toArray(new DateFormat[0]);
+        
+        // 初始化时间样式
+        List<TimeFormat> times = New.list();
+        for (Field field : TimeFormat.class.getFields()) {
+            times.add(getFieldValue(field, TimeFormat.class));
+        }
+        TIME_FORMATS = times.toArray(new TimeFormat[0]);
+        
+        formats.addAll(dateTimes);
+        formats.addAll(dates);
+        formats.addAll(times);
+        FORMATS = formats.toArray(new BaseFormat[0]);
+        
+        // 初始化格式化对象
+        List<DateTimeFormatter> formatters = New.list();
+        for (Field field : DateTimeFormatter.class.getDeclaredFields()) {
+            formatters.add(getFieldValue(field, DateTimeFormatter.class));
+        }
+        DATE_TIME_FORMATTERS = formatters.toArray(new DateTimeFormatter[0]);
+    }
+    
+    private static <T> T getFieldValue(Field field, Class<T> clazz) {
+        if (field != null) {
             field.setAccessible(true);
-            Class<?> fieldType = field.getType();
-            if (fieldType.equals(DateTimeFormatter.class)) {
+            if (field.getType().equals(clazz)) {
                 try {
-                    DateTimeFormatter formatter = (DateTimeFormatter) field.get(null);
-                    formatters.add(formatter);
-                } catch (Exception e) {
+                    return (T) field.get(null);
+                } catch (IllegalAccessException e) {
                     e.printStackTrace();
+                    return null;
                 }
             }
         }
-        pattersCount = patterns.size();
-        formatterCount = formatters.size();
+        return null;
     }
-    
     
 }

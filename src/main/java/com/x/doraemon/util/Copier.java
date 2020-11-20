@@ -1,11 +1,8 @@
 package com.x.doraemon.util;
 
 import com.google.gson.Gson;
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
-import org.checkerframework.checker.units.qual.A;
 
 import java.io.*;
-import java.util.*;
 
 public final class Copier {
     
@@ -50,11 +47,11 @@ public final class Copier {
     // ------------------------ 私有方法 ------------------------
     
     private static byte[] serialize(Serializable serializable) throws IOException {
-        try (ByteOutputStream bos = new ByteOutputStream();
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
              ObjectOutputStream oos = new ObjectOutputStream(bos)) {
             oos.writeObject(serializable);
             oos.flush();
-            return bos.getBytes();
+            return bos.toByteArray();
         }
     }
     
