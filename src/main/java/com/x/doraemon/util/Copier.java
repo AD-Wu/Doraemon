@@ -38,7 +38,7 @@ public final class Copier {
      *
      * @return
      */
-    public static <T> T clone(T clone) {
+    public static <T> T copy(T clone) {
         Gson gson = new Gson();
         return (T) gson.fromJson(gson.toJson(clone), clone.getClass());
         
