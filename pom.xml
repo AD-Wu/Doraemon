@@ -12,6 +12,12 @@
         <log4j2.version>2.13.3</log4j2.version>
     </properties>
     <dependencies>
+        <!--   获取文件原来的编码方式    -->
+        <dependency>
+            <groupId>com.ibm.icu</groupId>
+            <artifactId>icu4j</artifactId>
+            <version>68.2</version>
+        </dependency>
         <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
