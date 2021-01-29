@@ -210,9 +210,6 @@ public class FileHelper {
             CharsetDetector detector = new CharsetDetector();
             detector.setText(data);
             CharsetMatch match = detector.detect();
-            if (match == null) {
-                return encoding;
-            }
             encoding = match.getName();
         } catch (IOException e) {
             e.printStackTrace();
