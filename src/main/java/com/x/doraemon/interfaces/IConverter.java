@@ -6,7 +6,9 @@ package com.x.doraemon.interfaces;
  * @Author AD
  */
 public interface IConverter<FROM, TO> {
-    
+
     TO convert(FROM from) throws Exception;
-    
+
+    FROM reconvert(TO to) throws Exception;
+
 }
