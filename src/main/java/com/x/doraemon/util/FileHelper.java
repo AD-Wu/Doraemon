@@ -1,16 +1,12 @@
 package com.x.doraemon.util;
 
-import com.ibm.icu.text.CharsetDetector;
-import com.ibm.icu.text.CharsetMatch;
 import com.x.doraemon.bean.New;
 import com.x.doraemon.bean.SB;
 import com.x.doraemon.enums.Charsets;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -131,6 +127,132 @@ public class FileHelper {
     }
 
     /**
+     * 创建文件夹
+     *
+     * @param path 文件夹路径
+     * @return true：文件夹已存在或创建成功  false：文件夹创建失败
+     */
+    public static boolean createFolder(String path) {
+        if (Strings.isNull(path)) {
+            return false;
+        }
+        try {
+            File file = new File(path);
+            return file.exists() || file.mkdirs();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 在当前app目录下创建多个文件夹
+     *
+     * @param paths
+     */
+    public static void createFolders(String[] paths) {
+        String appPath = getAppPath(true);
+        for (int i = 0, L = paths.length; i < L; ++i) {
+            createFolder(appPath + paths[i]);
+        }
+    }
+
+    /**
+     * 拷贝文件至指定文件夹。如果文件已存在，则不拷贝
+     *
+     * @param filePath   文件路径
+     * @param folderPath 文件夹路径
+     * @return
+     */
+    public static boolean copyFile(String filePath, String folderPath) {
+        // 判断文件和文件夹路径的有效性
+        if (Strings.isNull(filePath) || Strings.isNull(folderPath)) {
+            return false;
+        }
+        // 创建文件对象
+        File file = new File(filePath);
+        // 创建文件夹对象
+        File folder = new File(fixPath(folderPath));
+        // 判断文件有效性
+        if (!file.exists() || !file.isFile()) {
+            return false;
+        }
+        // 目标文件夹不存在
+        if (!folder.exists()) {
+            // 创建文件夹
+            folder.mkdirs();
+        }
+        // 在目标文件夹下创建新文件对象
+        File newFile = new File(fixPath(folder.getAbsolutePath(), true) + file.getName());
+        // 判断文件是否已存在
+        if (newFile.exists()) {
+            return false;
+        }
+        // 读取文件，同时写出文件
+        try (FileInputStream in = new FileInputStream(file);
+             FileOutputStream out = new FileOutputStream(newFile)) {
+            byte[] buf = new byte[1024];
+            int length;
+            while ((length = in.read(buf)) != -1) {
+                out.write(buf, 0, length);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 将源文件夹下的所有文件拷贝至目标文件夹（包括srcFolder）
+     *
+     * @param srcFolder    需拷贝的文件夹路径
+     * @param targetFolder 目的地文件夹
+     */
+    public static boolean copyFolder(String srcFolder, String targetFolder) {
+        // 判断源文件夹和目的地文件夹路径的有效性
+        if (Strings.isNull(srcFolder) || Strings.isNull(targetFolder)) {
+            return false;
+        }
+        // 创建源文件夹对象
+        File src = new File(srcFolder);
+        // 创建目的地文件夹对象
+        File target = new File(targetFolder);
+        // 判断源文件夹是否存在
+        if (!src.exists()) {
+            return false;
+        }
+        // 判断目的地文件夹是否存在
+        if (!target.exists()) {
+            // 创建目的地文件夹
+            if (!createFolder(targetFolder)) {
+                return false;
+            }
+        }
+        // 判断源文件是否非目录
+        if (src.isFile()) {
+            // 非目录直接拷贝
+            return copyFile(srcFolder, targetFolder);
+        } else {
+            // 往目的地文件夹创建源文件夹
+            targetFolder = fixPath(targetFolder, true) + src.getName();
+            if (!createFolder(targetFolder)) {
+                return false;
+            }
+            File[] files = src.listFiles();
+            for (File file : files) {
+                if (!copyFolder(file.getPath(), targetFolder)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+
+    }
+
+
+    /**
      * 以UTF-8的方式读取xxx.txt文本
      *
      * @param txtPath
@@ -139,7 +261,7 @@ public class FileHelper {
      */
     public static String readTxt(String txtPath) throws IOException {
         // 以UTF-8的形式读取txt内容
-        return readTxt(txtPath, getFileCharset(txtPath));
+        return readTxt(txtPath, "UTF-8");
     }
 
     /**
@@ -199,22 +321,6 @@ public class FileHelper {
 
         }
         return result;
-    }
-
-    public static String getFileCharset(String filePath) {
-        String encoding = null;
-
-        try {
-            Path path = Paths.get(filePath);
-            byte[] data = Files.readAllBytes(path);
-            CharsetDetector detector = new CharsetDetector();
-            detector.setText(data);
-            CharsetMatch match = detector.detect();
-            encoding = match.getName();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return encoding;
     }
 
     /**
@@ -303,12 +409,25 @@ public class FileHelper {
         return endWithSP ? APP_PATH + SP : APP_PATH;
     }
 
-    public static String fixFolderPath(String path) {
-        return fixPath(path, true);
-    }
+    /**
+     * 获取文件夹下的所有非目录文件路径
+     *
+     * @param folderPath 文件夹路径
+     * @return String[] 非目录文件路径数组
+     */
+    public static String[] getFiles(String folderPath) {
+        // 判断文件夹路径有效性
+        if (Strings.isNull(folderPath)) {
+            // 返回空数组
+            return ArrayHelper.EMPTY_STRING;
+        }
+        // 创建容器
+        List<String> filePaths = New.list();
+        // 递归获取文件
+        getFiles(filePaths, folderPath);
+        // 返回转换结果
+        return filePaths.toArray(ArrayHelper.EMPTY_STRING);
 
-    public static String fixFilePath(String path) {
-        return fixPath(path, false);
     }
 
     /**
@@ -370,6 +489,23 @@ public class FileHelper {
         // 返回修正路径
         return fixPath;
 
+    }
+
+    /**
+     * 递归获取文件夹下的所有非目录文件路径
+     *
+     * @param filePaths  路径容器
+     * @param folderPath 文件夹路径
+     */
+    private static void getFiles(List<String> filePaths, String folderPath) {
+        File folder = new File(folderPath);
+        if (folder.isDirectory()) {
+            for (File file : folder.listFiles()) {
+                getFiles(filePaths, file.getPath());
+            }
+        } else {
+            filePaths.add(folder.getPath());
+        }
     }
 
 }

@@ -17,7 +17,7 @@ class FileHelperTest {
 
     @BeforeAll
     static void before() {
-        String rootFolder = FileHelper.fixFolderPath(new File("").getAbsolutePath());
+        String rootFolder = FileHelper.fixPath(new File("").getAbsolutePath(), true);
         filePath = rootFolder + "temp" + FileHelper.SP + "test" + FileHelper.SP + "xxx.txt";
     }
 
@@ -49,9 +49,28 @@ class FileHelperTest {
     }
 
     @Test
-    void getFileCharset() {
-        String charset = FileHelper.getFileCharset(filePath);
-        System.out.println(charset);
+    void copyFile() {
+        FileHelper.createFile(filePath, "这是一个拷贝测试");
+        String folder = FileHelper.getAppPath(false);
+        boolean b = FileHelper.copyFile(filePath, folder);
+        System.out.println("【" + filePath + "】拷贝文件至【" + folder + "】成功?" + b);
+    }
+
+    @Test
+    void getFiles() {
+        String appPath = FileHelper.getAppPath(false);
+        String[] files = FileHelper.getFiles(appPath);
+        for (String file : files) {
+            System.out.println(file);
+        }
+    }
+
+    @Test
+    void copyFolder() {
+        String appPath = FileHelper.getAppPath(false);
+        String targetFolder = "E:\\";
+        boolean b = FileHelper.copyFolder(appPath, targetFolder);
+        System.out.println(b);
     }
 
 }
