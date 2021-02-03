@@ -12,15 +12,15 @@ import java.io.IOException;
  * @Author AD
  */
 class FileHelperTest {
-
+    
     private static String filePath;
-
+    
     @BeforeAll
     static void before() {
         String rootFolder = FileHelper.fixPath(new File("").getAbsolutePath(), true);
         filePath = rootFolder + "temp" + FileHelper.SP + "test" + FileHelper.SP + "xxx.txt";
     }
-
+    
     @Test
     void createFile() {
         try {
@@ -30,14 +30,14 @@ class FileHelperTest {
             e.printStackTrace();
         }
     }
-
+    
     @Test
     void testCreateFile() {
         boolean success = FileHelper.createFile(filePath, "这是一个测试内容");
         System.out.println(filePath);
         System.out.println(success);
     }
-
+    
     @Test
     void readTxt() {
         try {
@@ -47,7 +47,7 @@ class FileHelperTest {
             e.printStackTrace();
         }
     }
-
+    
     @Test
     void copyFile() {
         FileHelper.createFile(filePath, "这是一个拷贝测试");
@@ -55,7 +55,7 @@ class FileHelperTest {
         boolean b = FileHelper.copyFile(filePath, folder);
         System.out.println("【" + filePath + "】拷贝文件至【" + folder + "】成功?" + b);
     }
-
+    
     @Test
     void getFiles() {
         String appPath = FileHelper.getAppPath(false);
@@ -64,13 +64,25 @@ class FileHelperTest {
             System.out.println(file);
         }
     }
-
+    
     @Test
     void copyFolder() {
         String appPath = FileHelper.getAppPath(false);
-        String targetFolder = "E:\\";
+        String targetFolder = appPath + FileHelper.SP + "temp";
         boolean b = FileHelper.copyFolder(appPath, targetFolder);
-        System.out.println(b);
+        System.out.println("【" + appPath + "】拷贝文件夹至【" + targetFolder + "】成功?" + b);
     }
-
+    
+    @Test
+    void deleteFile() {
+        boolean b = FileHelper.deleteFile("/Users/sunday/IdeaProjects/Doraemon/temp/Doraemon/Doraemon.iml");
+        System.out.println("删除文件成功?" + b);
+    }
+    
+    @Test
+    void deleteFolder() {
+        boolean b = FileHelper.deleteFolder("/Users/sunday/IdeaProjects/Doraemon/temp");
+        System.out.println("删除文件夹成功?" + b);
+    }
+    
 }

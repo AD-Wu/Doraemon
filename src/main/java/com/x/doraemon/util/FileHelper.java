@@ -15,9 +15,8 @@ import java.util.Objects;
  * @Author AD
  */
 public class FileHelper {
-
+    
     // ------------------------ 成员变量 ------------------------
-
     /**
      * Windows：
      * <p>
@@ -32,32 +31,30 @@ public class FileHelper {
      * 　　由于网络使用Unix标准，所以网络路径用“/”。
      */
     public static final String SP = File.separator;
-
     /**
      * 类加载器
      */
     private static final ClassLoader LOADER = Thread.currentThread().getContextClassLoader();
-
     /**
      * 当前应用路径
      */
     private static String APP_PATH;
-
+    
     // ------------------------ 构造方法 ------------------------
-
+    
     /**
      * 构造方法
      */
     private FileHelper() {
     }
-
-
+    
     // ------------------------ 成员方法 ------------------------
-
+    
     /**
      * 创建文件（通过文件名绝对路径创建空白文件）
      *
      * @param fileAbsPath 完整文件名，即绝对路径，如：/home/xxx.txt
+     *
      * @return File 文件对象
      */
     public static File createFile(String fileAbsPath) throws Exception {
@@ -93,24 +90,26 @@ public class FileHelper {
             }
         }
     }
-
+    
     /**
      * 默认以UTF-8的编码创建文件,content会覆盖原有文件内容
      *
      * @param fileAbsPath 文件名
      * @param content     文件内容
+     *
      * @return true:成功 <p> false:失败
      */
     public static boolean createFile(String fileAbsPath, String content) {
         return createFile(fileAbsPath, content, Charsets.UTF8.name());
     }
-
+    
     /**
      * 创建文件,如果文件已存在,会覆盖原有内容
      *
      * @param fileAbsPath 文件名
      * @param content     文件内容
      * @param charset     文件字符编码
+     *
      * @return true:成功 <p> false:失败
      */
     public static boolean createFile(String fileAbsPath, String content, String charset) {
@@ -125,11 +124,12 @@ public class FileHelper {
         }
         return false;
     }
-
+    
     /**
      * 创建文件夹
      *
      * @param path 文件夹路径
+     *
      * @return true：文件夹已存在或创建成功  false：文件夹创建失败
      */
     public static boolean createFolder(String path) {
@@ -144,7 +144,7 @@ public class FileHelper {
             return false;
         }
     }
-
+    
     /**
      * 在当前app目录下创建多个文件夹
      *
@@ -156,12 +156,13 @@ public class FileHelper {
             createFolder(appPath + paths[i]);
         }
     }
-
+    
     /**
      * 拷贝文件至指定文件夹。如果文件已存在，则不拷贝
      *
      * @param filePath   文件路径
      * @param folderPath 文件夹路径
+     *
      * @return
      */
     public static boolean copyFile(String filePath, String folderPath) {
@@ -202,7 +203,7 @@ public class FileHelper {
         }
         return true;
     }
-
+    
     /**
      * 将源文件夹下的所有文件拷贝至目标文件夹（包括srcFolder）
      *
@@ -235,41 +236,116 @@ public class FileHelper {
             return copyFile(srcFolder, targetFolder);
         } else {
             // 往目的地文件夹创建源文件夹
-            targetFolder = fixPath(targetFolder, true) + src.getName();
-            if (!createFolder(targetFolder)) {
+            String subFolder = fixPath(targetFolder, true) + src.getName();
+            if (!createFolder(subFolder)) {
                 return false;
             }
+            // 获取源文件夹下所有文件
             File[] files = src.listFiles();
+            // 遍历所有文件
             for (File file : files) {
-                if (!copyFolder(file.getPath(), targetFolder)) {
+                // 如果目标文件夹和源文件夹是同级目录，要避免无限递归
+                if (file.getPath().equals(targetFolder)) {
+                    continue;
+                }
+                // 递归拷贝
+                if (!copyFolder(file.getPath(), subFolder)) {
                     return false;
                 }
             }
             return true;
         }
-
-
     }
-
-
+    
+    /**
+     * 删除文件或空文件夹
+     *
+     * @param filePath 文件路径
+     *
+     * @return true:删除成功  false:删除不成功
+     */
+    public static boolean deleteFile(String filePath) {
+        // 判断路径有效性
+        if (Strings.isNull(filePath)) {
+            return false;
+        }
+        // 创建文件对象
+        File file = new File(filePath);
+        // 如果是目录
+        if (file.isDirectory()) {
+            // 非空目录不删除
+            if (file.listFiles().length > 0) {
+                return false;
+            }
+            // 空目录则删除
+            return file.delete();
+        }
+        // 文件不存在表示删除成功
+        if (!file.exists()) {
+            return true;
+        }
+        // 返回删除结果
+        return file.delete();
+    }
+    
+    /**
+     * 删除文件夹
+     *
+     * @param folderPath 文件夹路径
+     *
+     * @return
+     */
+    public static boolean deleteFolder(String folderPath) {
+        // 判断路径有效性
+        if (Strings.isNull(folderPath)) {
+            return false;
+        }
+        // 创建文件对象
+        File folder = new File(folderPath);
+        // 判断是否是文件
+        if (folder.isFile()) {
+            // 文件直接删除
+            return deleteFile(folder.getPath());
+        }
+        // 获取文件夹下所有文件
+        File[] files = folder.listFiles();
+        // 判断是否是空文件夹
+        if (files.length == 0) {
+            // 删除空文件夹
+            return folder.delete();
+        }
+        // 非空文件夹，便利所有文件对象
+        for (File file : files) {
+            // 遍历删除
+            deleteFolder(file.getPath());
+        }
+        // 最后删除根文件夹
+        return folder.delete();
+        
+    }
+    
     /**
      * 以UTF-8的方式读取xxx.txt文本
      *
      * @param txtPath
+     *
      * @return
+     *
      * @throws IOException
      */
     public static String readTxt(String txtPath) throws IOException {
         // 以UTF-8的形式读取txt内容
         return readTxt(txtPath, "UTF-8");
     }
-
+    
     /**
      * 读取xxx.txt文本
      *
      * @param txtPath  文本路径
      * @param encoding 字符编码
+     *
      * @return
+     *
      * @throws IOException
      */
     public static String readTxt(String txtPath, String encoding) throws IOException {
@@ -318,28 +394,32 @@ public class FileHelper {
                 }
             } catch (Exception e) {
             }
-
+            
         }
         return result;
     }
-
+    
     /**
      * 获取唯一字符读取器
      *
      * @param in 输入流
+     *
      * @return
+     *
      * @throws IOException
      */
     public static InputStreamReader getUnicodeReader(InputStream in) throws IOException {
         return getUnicodeReader(in, Charsets.UTF8.name());
     }
-
+    
     /**
      * 获取唯一字符读取器
      *
      * @param in       输入流
      * @param encoding 字符编码
+     *
      * @return
+     *
      * @throws IOException
      */
     public static InputStreamReader getUnicodeReader(InputStream in, String encoding) throws IOException {
@@ -369,21 +449,22 @@ public class FileHelper {
                 if (encoding == null || encoding.equals("")) {
                     encoding = Charset.defaultCharset().name();
                 }
-
+                
                 unread = byteNums;
             }
             if (unread > 0) {
                 back.unread(buf, byteNums - unread, unread);
             }
-
+            
             return new InputStreamReader(back, encoding);
         }
     }
-
+    
     /**
      * 获取当前应用所在的路径
      *
      * @param endWithSP 返回的路径是否要以系统文件分隔符结束
+     *
      * @return
      */
     public static String getAppPath(boolean endWithSP) {
@@ -408,11 +489,12 @@ public class FileHelper {
         // 判断是否以文件分隔符结尾，并返回结果
         return endWithSP ? APP_PATH + SP : APP_PATH;
     }
-
+    
     /**
      * 获取文件夹下的所有非目录文件路径
      *
      * @param folderPath 文件夹路径
+     *
      * @return String[] 非目录文件路径数组
      */
     public static String[] getFiles(String folderPath) {
@@ -427,32 +509,34 @@ public class FileHelper {
         getFiles(filePaths, folderPath);
         // 返回转换结果
         return filePaths.toArray(ArrayHelper.EMPTY_STRING);
-
+        
     }
-
+    
     /**
      * 根据文件系统分隔符修正路径，并以分隔符结尾
      *
      * @param path 路径
+     *
      * @return
      */
     public static String fixPath(String path) {
         return fixPath(path, false);
     }
-
+    
     /**
      * 根据文件系统分隔符修正路径
      *
      * @param path      路径
      * @param endWithSP 是否以文件系统的分隔符结尾
+     *
      * @return
      */
     public static String fixPath(String path, boolean endWithSP) {
         return fixPath(path, SP, endWithSP);
     }
-
+    
     // ------------------------ 私有方法 ------------------------
-
+    
     private static String fixPath(String path, String fileSeparator, boolean endWithSP) {
         // 判断需要修正的路径是否有效
         if (Strings.isNull(path)) {
@@ -463,7 +547,7 @@ public class FileHelper {
         if ("\\".equals(fileSeparator)) {
             // 将“/”全部修改为：“\”
             fixPath = path.replaceAll("/", "\\\\");
-
+            
         }
         // linux系统
         else if ("/".equals(fileSeparator)) {
@@ -488,9 +572,9 @@ public class FileHelper {
         }
         // 返回修正路径
         return fixPath;
-
+        
     }
-
+    
     /**
      * 递归获取文件夹下的所有非目录文件路径
      *
@@ -507,5 +591,5 @@ public class FileHelper {
             filePaths.add(folder.getPath());
         }
     }
-
+    
 }
