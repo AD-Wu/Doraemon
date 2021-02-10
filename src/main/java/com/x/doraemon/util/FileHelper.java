@@ -5,7 +5,11 @@ import com.x.doraemon.bean.SB;
 import com.x.doraemon.enums.Charsets;
 
 import java.io.*;
+import java.math.BigInteger;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.security.MessageDigest;
 import java.util.List;
 import java.util.Objects;
 
@@ -510,6 +514,36 @@ public class FileHelper {
         // 返回转换结果
         return filePaths.toArray(ArrayHelper.EMPTY_STRING);
         
+    }
+    
+    /**
+     * 获取文件对象MD5值
+     *
+     * @param file 文件对象
+     *
+     * @return 文件对象的MD5值（大写）
+     */
+    public static String getMD5(File file) {
+        // 判断文件有效性
+        if (file == null) {
+            return "";
+        }
+        // 创建文件输入流
+        try (FileInputStream fin = new FileInputStream(file)) {
+            // 读取文件字节缓冲数据
+            MappedByteBuffer buf = fin.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, file.length());
+            // 获取MD5算法对象
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            // 计算MD5值
+            md5.update(buf);
+            // 创建大数对象
+            BigInteger bi = new BigInteger(1, md5.digest());
+            // 转换为16进制
+            return bi.toString(16).toUpperCase();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
     }
     
     /**
