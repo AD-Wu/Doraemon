@@ -22,38 +22,38 @@ class ConvertsTest {
     @Test
     void arrayToString() {
 
-        String s = Converts.arrayToString(new int[]{1, 2, 3, 4, 5});
+        String s = ConvertHelper.arrayToString(new int[]{1, 2, 3, 4, 5});
         System.out.println(s);
     }
 
     @Test
     void byteToHex() {
-        String s = Converts.byteToHex((byte) 15);
+        String s = ConvertHelper.byteToHex((byte) 15);
         System.out.println(s);
     }
 
     @Test
     void bytesToHex() {
-        String s = Converts.bytesToHex(bs);
+        String s = ConvertHelper.bytesToHex(bs);
         System.out.println(s);
     }
 
     @Test
     void bytesToHexWithDelimiter() {
-        String s = Converts.bytesToHexWithDelimiter(bs, "哈哈");
+        String s = ConvertHelper.bytesToHexWithDelimiter(bs, "哈哈");
         System.out.println(s);
     }
 
     @Test
     void hexToBytes() {
-        byte[] bytes = Converts.hexToBytes(null);
-        System.out.println(Converts.bytesToHexWithDelimiter(bytes, "|"));
+        byte[] bytes = ConvertHelper.hexToBytes(null);
+        System.out.println(ConvertHelper.bytesToHexWithDelimiter(bytes, "|"));
     }
 
     @Test
     void hexToByte() {
-        String hex = Converts.byteToHex((byte) 65);
-        byte b = Converts.hexToByte(hex);
+        String hex = ConvertHelper.byteToHex((byte) 65);
+        byte b = ConvertHelper.hexToByte(hex);
         System.out.println("byte=65,hex=" + hex);
         System.out.println("hex=" + hex + ",byte=" + b);
     }
@@ -61,8 +61,8 @@ class ConvertsTest {
     @Test
     void hexWithDelimiterToBytes() {
         byte[] bs = {1, 2, 3, 4, 98, 76, 65, 54, 43};
-        String hex = Converts.bytesToHexWithDelimiter(bs, "|");
-        byte[] bytes = Converts.hexWithDelimiterToBytes(hex, "|");
+        String hex = ConvertHelper.bytesToHexWithDelimiter(bs, "|");
+        byte[] bytes = ConvertHelper.hexWithDelimiterToBytes(hex, "|");
         System.out.println("bs=" + Arrays.toString(bs));
         System.out.println("hex=" + hex);
         System.out.println("===============================");

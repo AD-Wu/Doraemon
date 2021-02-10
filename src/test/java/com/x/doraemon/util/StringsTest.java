@@ -3,8 +3,6 @@ package com.x.doraemon.util;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 /**
  * @Desc
  * @Date 2021/2/1 14:50
@@ -21,7 +19,7 @@ class StringsTest {
 
     @Test
     void removeSpaces() {
-        String fix = Strings.removeSpaces(s);
+        String fix = StringHelper.removeSpaces(s);
         System.out.println(s);
         System.out.println(fix);
         System.out.println(s.trim());
