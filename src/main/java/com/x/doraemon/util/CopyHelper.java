@@ -4,12 +4,12 @@ import com.google.gson.Gson;
 
 import java.io.*;
 
-public final class Copier {
+public final class CopyHelper {
     
     // ------------------------ 变量定义 ------------------------
     
     // ------------------------ 构造方法 ------------------------
-    private Copier() {}
+    private CopyHelper() {}
     
     // ------------------------ 方法定义 ------------------------
     

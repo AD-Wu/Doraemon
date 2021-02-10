@@ -137,7 +137,7 @@ public class FileHelper {
      * @return true：文件夹已存在或创建成功  false：文件夹创建失败
      */
     public static boolean createFolder(String path) {
-        if (Strings.isNull(path)) {
+        if (StringHelper.isNull(path)) {
             return false;
         }
         try {
@@ -171,7 +171,7 @@ public class FileHelper {
      */
     public static boolean copyFile(String filePath, String folderPath) {
         // 判断文件和文件夹路径的有效性
-        if (Strings.isNull(filePath) || Strings.isNull(folderPath)) {
+        if (StringHelper.isNull(filePath) || StringHelper.isNull(folderPath)) {
             return false;
         }
         // 创建文件对象
@@ -216,7 +216,7 @@ public class FileHelper {
      */
     public static boolean copyFolder(String srcFolder, String targetFolder) {
         // 判断源文件夹和目的地文件夹路径的有效性
-        if (Strings.isNull(srcFolder) || Strings.isNull(targetFolder)) {
+        if (StringHelper.isNull(srcFolder) || StringHelper.isNull(targetFolder)) {
             return false;
         }
         // 创建源文件夹对象
@@ -270,7 +270,7 @@ public class FileHelper {
      */
     public static boolean deleteFile(String filePath) {
         // 判断路径有效性
-        if (Strings.isNull(filePath)) {
+        if (StringHelper.isNull(filePath)) {
             return false;
         }
         // 创建文件对象
@@ -301,7 +301,7 @@ public class FileHelper {
      */
     public static boolean deleteFolder(String folderPath) {
         // 判断路径有效性
-        if (Strings.isNull(folderPath)) {
+        if (StringHelper.isNull(folderPath)) {
             return false;
         }
         // 创建文件对象
@@ -473,7 +473,7 @@ public class FileHelper {
      */
     public static String getAppPath(boolean endWithSP) {
         // 判断当前app路径是否有效
-        if (Strings.isNull(APP_PATH)) {
+        if (StringHelper.isNull(APP_PATH)) {
             // 获取当前app路径
             String absPath = new File("").getAbsolutePath();
             // 判断是否以文件分隔符结尾
@@ -503,7 +503,7 @@ public class FileHelper {
      */
     public static String[] getFiles(String folderPath) {
         // 判断文件夹路径有效性
-        if (Strings.isNull(folderPath)) {
+        if (StringHelper.isNull(folderPath)) {
             // 返回空数组
             return ArrayHelper.EMPTY_STRING;
         }
@@ -573,7 +573,7 @@ public class FileHelper {
     
     private static String fixPath(String path, String fileSeparator, boolean endWithSP) {
         // 判断需要修正的路径是否有效
-        if (Strings.isNull(path)) {
+        if (StringHelper.isNull(path)) {
             return "";
         }
         String fixPath;

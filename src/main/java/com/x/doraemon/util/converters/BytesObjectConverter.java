@@ -2,9 +2,9 @@ package com.x.doraemon.util.converters;
 
 import com.x.doraemon.interfaces.IConverter;
 import com.x.doraemon.util.ArrayHelper;
-import com.x.doraemon.util.Converts;
-import com.x.doraemon.util.Logs;
-import com.x.doraemon.util.Strings;
+import com.x.doraemon.util.ConvertHelper;
+import com.x.doraemon.util.LogHelper;
+import com.x.doraemon.util.StringHelper;
 
 import java.io.*;
 
@@ -43,7 +43,7 @@ public class BytesObjectConverter implements IConverter<byte[], Serializable> {
                 out.flush();
                 return bsOut.toByteArray();
             } catch (IOException e) {
-                Logs.getLogger(Converts.class).error(Strings.getExceptionTrace(e));
+                LogHelper.getLogger(ConvertHelper.class).error(StringHelper.getExceptionTrace(e));
                 return EMPTY_BYTE;
             }
         }

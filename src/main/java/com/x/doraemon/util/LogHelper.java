@@ -8,12 +8,12 @@ import org.apache.log4j.Logger;
  * @Date 2020/9/24 00:50
  * @Author AD
  */
-public final class Logs {
+public final class LogHelper {
     
     // ------------------------ 变量定义 ------------------------
     
     // ------------------------ 构造方法 ------------------------
-    private Logs() {}
+    private LogHelper() {}
     // ------------------------ 方法定义 ------------------------
     
     /**

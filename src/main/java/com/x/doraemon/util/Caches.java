@@ -27,13 +27,13 @@ public final class Caches {
                         Integer key = notification.getKey();
                         Integer value = notification.getValue();
                         RemovalCause cause = notification.getCause();
-                        System.out.println(Strings.replace("缓存被移除，key={0},value={1},cause={2}", key, value, cause));
+                        System.out.println(StringHelper.replace("缓存被移除，key={0},value={1},cause={2}", key, value, cause));
                     }
                 })
                 .build(new CacheLoader<Integer, Integer>() {
                     @Override
                     public Integer load(Integer integer) throws Exception {
-                        System.out.println(Strings.replace("加载缓存,key={0},value={1}", integer, 1));
+                        System.out.println(StringHelper.replace("加载缓存,key={0},value={1}", integer, 1));
                         return 2;
                     }
                 });
@@ -41,7 +41,7 @@ public final class Caches {
         loadingCache.put(1, 1);
         for (; ; ) {
             Integer value = loadingCache.get(1);
-            System.out.println(Strings.replace("当前缓存信息，key={0},value={1}", 1, value));
+            System.out.println(StringHelper.replace("当前缓存信息，key={0},value={1}", 1, value));
             TimeUnit.SECONDS.sleep(1);
             if (loadingCache.size() == 0) {
                 break;

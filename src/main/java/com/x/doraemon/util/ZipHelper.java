@@ -105,7 +105,7 @@ public class ZipHelper {
      * @throws Exception
      */
     public static boolean zip(String source) throws Exception {
-        if (Strings.isNull(source)) {
+        if (StringHelper.isNull(source)) {
             return false;
         }
         return zip(source, source + ".zip");

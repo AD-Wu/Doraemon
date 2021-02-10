@@ -8,20 +8,20 @@ import java.io.*;
 import java.math.BigDecimal;
 
 import static com.x.doraemon.util.ArrayHelper.EMPTY_BYTE;
-import static com.x.doraemon.util.Strings.ALL_HEX;
-import static com.x.doraemon.util.Strings.HEX;
+import static com.x.doraemon.util.StringHelper.ALL_HEX;
+import static com.x.doraemon.util.StringHelper.HEX;
 
 /**
  * @Desc 转换帮助类
  * @Date 2020/7/29 00:59
  * @Author AD
  */
-public class Converts {
+public class ConvertHelper {
 
     // ------------------------ 变量定义 ------------------------
 
     // ------------------------ 构造方法 ------------------------
-    private Converts() {
+    private ConvertHelper() {
     }
 
     // ------------------------ 方法定义 ------------------------
@@ -117,7 +117,7 @@ public class Converts {
      * @return byte[]字节数组
      */
     public static byte[] hexToBytes(String hex) {
-        if (Strings.isNull(hex)) {
+        if (StringHelper.isNull(hex)) {
             return EMPTY_BYTE;
         }
         char[] cs = hex.toUpperCase().toCharArray();
@@ -155,11 +155,11 @@ public class Converts {
      */
     public static byte[] hexWithDelimiterToBytes(String hex, String delimiter) {
         // 判断字符串有效性
-        if (Strings.isNull(hex)) {
+        if (StringHelper.isNull(hex)) {
             return EMPTY_BYTE;
         }
         // 判断分割符是否为空
-        if (Strings.isNotNull(delimiter)) {
+        if (StringHelper.isNotNull(delimiter)) {
             // 判断分隔符是否需要转义
             if ("|".equals(delimiter)) {
                 delimiter = "\\|";
@@ -200,7 +200,7 @@ public class Converts {
         if (value == null) {
             return defaultValue;
         }
-        String t = Strings.toUpperCase(value);
+        String t = StringHelper.toUpperCase(value);
         return "TRUE".equals(t) || "Y".equals(t) || "YES".equals(t) || ("1".equals(t)) || defaultValue;
     }
 
@@ -246,7 +246,7 @@ public class Converts {
                 // 转为字符串
                 String s = value.toString();
                 // 判断有效性
-                if (Strings.isNull(s)) {
+                if (StringHelper.isNull(s)) {
                     // 返回默认值
                     return defaultValue;
                 } else {
@@ -281,7 +281,7 @@ public class Converts {
         }
         if (!(value instanceof Byte) && !(value instanceof Integer)) {
             String s = value.toString();
-            if (Strings.isNull(s)) {
+            if (StringHelper.isNull(s)) {
                 return defaultValue;
             } else {
                 try {
@@ -313,7 +313,7 @@ public class Converts {
             if (!value.getClass().equals(Integer.TYPE) && !(value instanceof Integer)) {
                 if (!value.getClass().equals(Double.TYPE) && !(value instanceof Double)) {
                     String s = value.toString();
-                    if (Strings.isNull(s)) {
+                    if (StringHelper.isNull(s)) {
                         return defaultValue;
                     } else {
                         try {
@@ -343,7 +343,7 @@ public class Converts {
         }
         if (!value.getClass().equals(Long.TYPE) && !(value instanceof Long)) {
             String s = value.toString();
-            if (Strings.isNull(s)) {
+            if (StringHelper.isNull(s)) {
                 return defaultValue;
             } else {
                 try {
@@ -370,7 +370,7 @@ public class Converts {
                 return ((Double) value).floatValue();
             } else {
                 String s = value.toString();
-                if (Strings.isNull(s)) {
+                if (StringHelper.isNull(s)) {
                     return defaultValue;
                 } else {
                     try {
@@ -395,7 +395,7 @@ public class Converts {
         }
         if (!value.getClass().equals(Double.TYPE) && !(value instanceof Double)) {
             String s = value.toString();
-            if (Strings.isNull(s)) {
+            if (StringHelper.isNull(s)) {
                 return defaultValue;
             } else {
                 try {
@@ -433,7 +433,7 @@ public class Converts {
                 out.flush();
                 return bsOut.toByteArray();
             } catch (IOException e) {
-                Logs.getLogger(Converts.class).error(Strings.getExceptionTrace(e));
+                LogHelper.getLogger(ConvertHelper.class).error(StringHelper.getExceptionTrace(e));
                 return EMPTY_BYTE;
             }
         }

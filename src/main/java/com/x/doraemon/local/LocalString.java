@@ -1,7 +1,7 @@
 package com.x.doraemon.local;
 
 import com.x.doraemon.util.FileHelper;
-import com.x.doraemon.util.Strings;
+import com.x.doraemon.util.StringHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +26,7 @@ public class LocalString {
      */
     public boolean load(String path) {
         // 判断路径有效性
-        if (Strings.isNull(path)) {
+        if (StringHelper.isNull(path)) {
             return false;
         }
         // 获取类加载起
@@ -58,7 +58,7 @@ public class LocalString {
      * @return
      */
     public String text(String key, Object... params) {
-        return Strings.replace(this.prop.getProperty(key), params);
+        return StringHelper.replace(this.prop.getProperty(key), params);
     }
     
 }

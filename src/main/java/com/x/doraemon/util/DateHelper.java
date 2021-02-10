@@ -20,7 +20,7 @@ import java.util.*;
  * @Date 2020/9/17 21:08
  * @Author AD
  */
-public final class Dates {
+public final class DateHelper {
     
     // ------------------------ 变量定义 ------------------------
     
@@ -35,7 +35,7 @@ public final class Dates {
     private static final DateTimeFormatter[] DATE_TIME_FORMATTERS;
     
     // ------------------------ 构造方法 ------------------------
-    private Dates() {}
+    private DateHelper() {}
     // ------------------------ 方法定义 ------------------------
     
     /**
@@ -54,7 +54,7 @@ public final class Dates {
         if (local == null) {
             String patter = "Can not parse the dateTime={0},implements {1} and add the annotation:@AutoService({2})";
             String name = IDateTimePattern.class.getName();
-            String msg = Strings.replace(patter, dateTime, name, name);
+            String msg = StringHelper.replace(patter, dateTime, name, name);
             throw new RuntimeException(msg);
         }
         // 返回结果

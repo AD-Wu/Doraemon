@@ -1,8 +1,8 @@
 package com.x.doraemon.collection;
 
 import com.x.doraemon.bean.New;
-import com.x.doraemon.util.Converts;
-import com.x.doraemon.util.Strings;
+import com.x.doraemon.util.ConvertHelper;
+import com.x.doraemon.util.StringHelper;
 
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +21,7 @@ public class DataSet {
     
     public void add(Object name, Object value) {
         if (name != null) {
-            this.datas.put(Strings.toUpperCase(name), value);
+            this.datas.put(StringHelper.toUpperCase(name), value);
         }
     }
     
@@ -33,7 +33,7 @@ public class DataSet {
     
     public void addAll(Map<String, Object> map) {
         if (map != null && map.size() != 0) {
-            map.entrySet().stream().forEach(next -> datas.put(Strings.toUpperCase(next.getKey()), next.getValue()));
+            map.entrySet().stream().forEach(next -> datas.put(StringHelper.toUpperCase(next.getKey()), next.getValue()));
         }
     }
     
@@ -50,15 +50,15 @@ public class DataSet {
     }
     
     public Object remove(Object key) {
-        return key == null ? null : datas.remove(Strings.toUpperCase(key));
+        return key == null ? null : datas.remove(StringHelper.toUpperCase(key));
     }
     
     public boolean containsKey(Object key) {
-        return key != null && datas.containsKey(Strings.toUpperCase(key));
+        return key != null && datas.containsKey(StringHelper.toUpperCase(key));
     }
     
     public <T> T get(Object key) {
-        return key == null ? null : (T) datas.get(Strings.toUpperCase(key));
+        return key == null ? null : (T) datas.get(StringHelper.toUpperCase(key));
     }
     
     public String getString(Object key) {
@@ -66,8 +66,8 @@ public class DataSet {
     }
     
     public String getString(Object key, String defaultValue) {
-        Object value = datas.get(Strings.toUpperCase(key));
-        return Optional.ofNullable(value).orElseGet(() -> Strings.isNull(defaultValue) ? "" : defaultValue).toString();
+        Object value = datas.get(StringHelper.toUpperCase(key));
+        return Optional.ofNullable(value).orElseGet(() -> StringHelper.isNull(defaultValue) ? "" : defaultValue).toString();
     }
     
     public short getShort(Object key) {
@@ -75,7 +75,7 @@ public class DataSet {
     }
     
     public short getShort(Object key, short defaultValue) {
-        Object value = datas.get(Strings.toUpperCase(key));
+        Object value = datas.get(StringHelper.toUpperCase(key));
         value = Optional.ofNullable(value).orElse(defaultValue);
         if (!value.getClass().equals(Short.TYPE)) {
             try {
@@ -93,7 +93,7 @@ public class DataSet {
     }
     
     public int getInt(Object key, int defaultValue) {
-        Object value = datas.get(Strings.toUpperCase(key));
+        Object value = datas.get(StringHelper.toUpperCase(key));
         value = Optional.ofNullable(value).orElse(defaultValue);
         if (!value.getClass().equals(Integer.TYPE)) {
             try {
@@ -111,7 +111,7 @@ public class DataSet {
     }
     
     public long getLong(Object key, long defaultValue) {
-        Object value = datas.get(Strings.toUpperCase(key));
+        Object value = datas.get(StringHelper.toUpperCase(key));
         value = Optional.ofNullable(value).orElse(defaultValue);
         if (!value.getClass().equals(Long.TYPE)) {
             try {
@@ -129,7 +129,7 @@ public class DataSet {
     }
     
     public double getDouble(Object key, double defaultValue) {
-        Object value = datas.get(Strings.toUpperCase(key));
+        Object value = datas.get(StringHelper.toUpperCase(key));
         value = Optional.ofNullable(value).orElse(defaultValue);
         if (!value.getClass().equals(Double.TYPE)) {
             try {
@@ -147,7 +147,7 @@ public class DataSet {
     }
     
     public float getFloat(Object key, float defaultValue) {
-        Object value = datas.get(Strings.toUpperCase(key));
+        Object value = datas.get(StringHelper.toUpperCase(key));
         value = Optional.ofNullable(value).orElse(defaultValue);
         if (!value.getClass().equals(Float.TYPE)) {
             try {
@@ -165,11 +165,11 @@ public class DataSet {
     }
     
     public boolean getBoolean(Object key, boolean defaultValue) {
-        Object value = datas.get(Strings.toUpperCase(key));
+        Object value = datas.get(StringHelper.toUpperCase(key));
         value = Optional.ofNullable(value).orElse(defaultValue);
         if (!value.getClass().equals(Boolean.TYPE)) {
-            String t = Strings.toUpperCase(value);
-            return Converts.toBoolean(t);
+            String t = StringHelper.toUpperCase(value);
+            return ConvertHelper.toBoolean(t);
         } else {
             return (boolean) value;
         }

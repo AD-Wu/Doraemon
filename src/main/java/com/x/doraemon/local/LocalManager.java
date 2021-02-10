@@ -1,7 +1,7 @@
 package com.x.doraemon.local;
 
 import com.x.doraemon.enums.Language;
-import com.x.doraemon.util.Strings;
+import com.x.doraemon.util.StringHelper;
 import com.x.doraemon.util.SystemHelper;
 
 import javax.swing.*;
@@ -84,7 +84,7 @@ public class LocalManager {
             if (defLocal != null) {
                 return defLocal;
             }
-            String path = Strings.replace(defPath, defaultLangKey);
+            String path = StringHelper.replace(defPath, defaultLangKey);
             defLocal = new LocalString();
             defLocal.load(path);
         }
@@ -109,7 +109,7 @@ public class LocalManager {
                 return local;
             }
             local = new LocalString();
-            if (!local.load(Strings.replace(defPath, langKey))) {
+            if (!local.load(StringHelper.replace(defPath, langKey))) {
                 local = getDefaultLocal();
             }
             localMap.put(langKey, local);
@@ -124,7 +124,7 @@ public class LocalManager {
      * @param langKey 如：zh_CN,en_US
      */
     public static void setDefaultLangKey(String langKey) {
-        if (!Strings.isNull(langKey) && SUPPORT_LANGUAGES.contains(langKey)) {
+        if (!StringHelper.isNull(langKey) && SUPPORT_LANGUAGES.contains(langKey)) {
             synchronized (langLock) {
                 defaultLangKey = langKey;
                 defLocal = null;

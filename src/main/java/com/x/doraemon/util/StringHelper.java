@@ -20,7 +20,7 @@ import java.util.stream.Stream;
  * @Date 2020/7/29 00:57
  * @Author AD
  */
-public final class Strings {
+public final class StringHelper {
 
     // ------------------------ 变量定义 ------------------------
 
@@ -51,7 +51,7 @@ public final class Strings {
     private static final Random RANDOM = new Random();
     // ------------------------ 构造方法 ------------------------
 
-    private Strings() {
+    private StringHelper() {
     }
 
     // ------------------------ 方法定义 ------------------------
@@ -153,7 +153,7 @@ public final class Strings {
     }
 
     public static String toJsonString(Object o) {
-        return o.getClass().getName() + "@" + o.hashCode() + "=" + Jsons.toJson(o);
+        return o.getClass().getName() + "@" + o.hashCode() + "=" + JsonHelper.toJson(o);
     }
 
     /**
@@ -248,12 +248,12 @@ public final class Strings {
      * @return true:不相等；false:相等
      */
     public static boolean isNotEquals(String check, String... values) {
-        if (Strings.isNull(check, false)) {
+        if (StringHelper.isNull(check, false)) {
             if (ArrayHelper.isEmpty(values)) {
                 return false;
             } else {
                 for (String value : values) {
-                    if (Strings.isNull(value, false)) {
+                    if (StringHelper.isNull(value, false)) {
                         return false;
                     }
                 }
