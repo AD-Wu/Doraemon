@@ -493,7 +493,7 @@ public final class StringHelper {
                 sb.append(LETTER_FIGURE[RANDOM.nextInt(L)]);
             }
         }
-        return sb.get();
+        return sb.toString();
     }
 
     /**

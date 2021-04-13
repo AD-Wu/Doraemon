@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  * @Date 2020/10/14 23:42
  * @Author AD
  */
-public final class Caches {
+public final class CacheHelper {
     
     public static void main(String[] args) throws Exception {
         // cacheTest();
