@@ -6,6 +6,8 @@ import com.x.doraemon.interfaces.IConverter;
 
 import java.io.*;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.x.doraemon.util.ArrayHelper.EMPTY_BYTE;
 import static com.x.doraemon.util.StringHelper.ALL_HEX;
@@ -33,6 +35,8 @@ public class ConvertHelper {
     public static <FROM, TO> FROM reconvert(IConverter<FROM, TO> converter, TO to) throws Exception {
         return converter.reconvert(to);
     }
+    
+    
 
     /**
      * int数组转为字符串
@@ -408,6 +412,27 @@ public class ConvertHelper {
             return (Double) value;
         }
     }
+    
+    public static <T> String toString(List<T> list) {
+        return toString(list, ",");
+    }
+    
+    public static <T> String toString(List<T> list, String split) {
+        if (!ArrayHelper.isEmpty(list)) {
+            SB sb = New.sb();
+            if (list != null) {
+                for (int i = 0, L = list.size(); i < L; ++i) {
+                    if (i > 0) {
+                        sb.append(split);
+                    }
+                    sb.append(list.get(i));
+                }
+            }
+            return sb.toString();
+        } else {
+            return "";
+        }
+    }
 
     public static BigDecimal toBigDecimal(Object value) {
         return toBigDecimal(value, (BigDecimal) null);
@@ -458,6 +483,70 @@ public class ConvertHelper {
             e.printStackTrace();
             return null;
         }
+    }
+    
+    /**
+     * 将两个数组进行复制整合
+     *
+     * @param first
+     * @param second
+     * @param <T>
+     *
+     * @return
+     */
+    public static <T> T[] concat(T[] first, T[] second) {
+        if (first == null) {
+            return second;
+        }
+        if (second == null) {
+            return first;
+        } else {
+            T[] ts = Arrays.copyOf(first, first.length + second.length);
+            System.arraycopy(second, 0, ts, first.length, second.length);
+            return ts;
+        }
+        
+    }
+    
+    public static int[] concat(int[] first, int[] second) {
+        if (first == null) {
+            return second;
+        }
+        if (second == null) {
+            return first;
+        } else {
+            int[] ts = Arrays.copyOf(first, first.length + second.length);
+            System.arraycopy(second, 0, ts, first.length, second.length);
+            return ts;
+        }
+    }
+    
+    public static <T> T[] concatAll(T[] first, T[]... ts) {
+        if (ts == null) {
+            return first;
+        }
+        int firstLen = first == null ? 0 : first.length;
+        int allLen = 0;
+        allLen += firstLen;
+        for (T[] t : ts) {
+            if (t != null) {
+                if (first == null) {
+                    first = t;
+                }
+                allLen += t.length;
+            }
+        }
+        if (allLen == 0) return null;
+        T[] all = Arrays.copyOf(first, allLen);
+        int L = first.length;
+        for (T[] t : ts) {
+            if (t != null && t.length > 0) {
+                System.arraycopy(t, 0, all, L, t.length);
+                L += t.length;
+            }
+            
+        }
+        return all;
     }
 
     // ------------------------ 私有方法 ------------------------
