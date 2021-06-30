@@ -6,7 +6,7 @@
 
     <groupId>com.x</groupId>
     <artifactId>Doraemon</artifactId>
-    <version>1.0</version>
+    <version>1.0.0</version>
 
     <properties>
         <log4j2.version>2.13.3</log4j2.version>
